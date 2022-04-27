@@ -47,8 +47,7 @@ variables:
     switch_state: '{{ states(water_heater_switch) }}'
     rising_threshold: !input rising_threshold
     falling_threshold: !input falling_threshold
-    difference: '{{ states(themperature_sensor)|float }}'
-    mode: '{% if switch_state == ''off'' and difference|float > rising_threshold|float %}on{%
-      elif switch_state == ''on'' and difference|float > falling_threshold|float %}on{% else %}off{%
+    mode: '{% if switch_state == ''off'' and states(themperature_sensor)|float < rising_threshold|float %}on{%
+      elif switch_state == ''on'' and states(themperature_sensor)|float > falling_threshold|float %}off{% else %}off{%
       endif %}'
 mode: single
