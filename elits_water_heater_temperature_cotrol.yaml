@@ -1,0 +1,54 @@
+blueprint:
+  name: Water Heater Management
+  description: Turn a water heater switch on and off based on the difference between a themperature sensor and a baseline
+  domain: automation
+  input:
+    themperature_sensor:
+        name: Themperature Sensor
+        description: A sensor that measures the themperature of wather
+        selector:
+          entity:
+            domain: sensor
+    water_heater_switch:
+        name: Wather Heater Switch
+        description: A switch that turns the water heater on and off
+        selector:
+          entity:
+            domain: switch
+    rising_threshold:
+        name: Rising Threshold
+        description: How many percentage points above the reference themperature the sensor can rise before the water heater is turned on
+        selector:
+          number:
+            min: 0
+            max: 70
+        default: 35
+    falling_threshold:
+        name: Falling Threshold
+        description: How many percentage points above the reference themperature the sensor must fall to before the fan is turned off
+        selector:
+          number:
+            min: 0
+            max: 70
+        default: 55
+    
+trigger:
+  - entity_id: !input themperature_sensor
+    platform: state
+condition:
+  - condition: template
+    value_template: '{{ mode != switch_state }}'
+action:
+  - service: switch.turn_{{mode}}
+    entity_id: !input water_heater_switch
+variables:
+    themperature_sensor: !input themperature_sensor
+    water_heater_switch: !input water_heater_switch
+    switch_state: '{{ states(water_heater_switch) }}'
+    rising_threshold: !input rising_threshold
+    falling_threshold: !input falling_threshold
+    difference: '{{ states(themperature_sensor)|float }}'
+    mode: '{% if switch_state == ''off'' and difference|float > rising_threshold|float %}on{%
+      elif switch_state == ''on'' and difference|float > falling_threshold|float %}on{% else %}off{%
+      endif %}'
+mode: single
