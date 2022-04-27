@@ -48,6 +48,6 @@ variables:
     rising_threshold: !input rising_threshold
     falling_threshold: !input falling_threshold
     mode: '{% if switch_state == ''off'' and states(themperature_sensor)|float < rising_threshold|float %}on{%
-      elif switch_state == ''on'' and states(themperature_sensor)|float > falling_threshold|float %}off{% else %}off{%
+      elif switch_state == ''on'' and states(themperature_sensor)|float > falling_threshold|float %}off{%
       endif %}'
 mode: single
